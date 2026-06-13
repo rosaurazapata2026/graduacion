@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Graduación · Rosaura Zapata 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#060F1E;
+  --navy2:#0B2040;
+  --blue:#1A4F8A;
+  --blue-mid:#2563AB;
+  --blue-light:#5B9BD5;
+  --blue-pale:#C8DCF0;
+  --gold:#C49A38;
+  --gold-bright:#DEAD55;
+  --gold-light:#F2D98A;
+  --gold-pale:#FAF0D4;
+  --gold-dark:#7A5A10;
+  --white:#FFFFFF;
+}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{
+  background:var(--navy);
+  font-family:'Montserrat',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  color:var(--white);
+}
+
+/* ── CANVAS ── */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ══════════════════════════════
+   SPLASH
+══════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:1000;
+  background:radial-gradient(ellipse 120% 100% at 40% 10%,#0E3870 0%,#060F1E 55%,#020810 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+  transition:opacity .9s cubic-bezier(.4,0,.2,1),transform .9s cubic-bezier(.4,0,.2,1);
+}
+#splash.hide{opacity:0;transform:scale(1.05);pointer-events:none;}
+
+/* floating orbs */
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(60px);pointer-events:none;opacity:0;
+  animation:orb-drift ease-in-out infinite;
+}
+@keyframes orb-drift{
+  0%{opacity:0;transform:translateY(0) scale(.9);}
+  20%{opacity:1;}
+  80%{opacity:.6;}
+  100%{opacity:0;transform:translateY(-80px) scale(1.1);}
+}
+
+/* particles */
+.sp{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,var(--gold-bright),transparent 70%);
+  animation:sp-float linear infinite;opacity:0;pointer-events:none;
+}
+@keyframes sp-float{
+  0%{transform:translateY(100vh) scale(0);opacity:0;}
+  8%{opacity:.8;}85%{opacity:.3;}
+  100%{transform:translateY(-8vh) scale(1.4);opacity:0;}
+}
+
+/* rings */
+.s-ring{
+  position:absolute;left:50%;top:48%;
+  border-radius:50%;
+  border:.5px solid rgba(196,151,58,.2);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  animation:ring-breath 4s ease-in-out infinite;
+}
+@keyframes ring-breath{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.04);}}
+
+.splash-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
+
+/* mortar board */
+.splash-hat{
+  width:96px;height:96px;margin-bottom:4px;
+  animation:hat-land .9s cubic-bezier(.22,1.2,.5,1) .3s both;
+  filter:drop-shadow(0 0 24px rgba(222,173,85,.6));
+}
+@keyframes hat-land{0%{opacity:0;transform:translateY(-50px) rotate(-15deg);}100%{opacity:1;transform:translateY(0) rotate(0);}}
+
+.splash-stars-row{display:flex;gap:10px;margin:10px 0 18px;animation:f-up .5s ease .85s both;}
+.s-star{
+  width:11px;height:11px;background:var(--gold-bright);
+  clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  animation:star-rot 8s linear infinite;
+}
+.s-star:nth-child(2){width:15px;height:15px;animation-delay:.2s;}
+.s-star:nth-child(3){animation-delay:.4s;}
+@keyframes star-rot{0%{transform:rotate(0);}100%{transform:rotate(360deg);}}
+
+.splash-eyebrow{font-size:9px;font-weight:600;letter-spacing:4.5px;text-transform:uppercase;color:var(--gold-bright);margin-bottom:6px;animation:f-up .5s ease .6s both;}
+.splash-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,10vw,52px);font-weight:300;
+  color:var(--white);text-align:center;line-height:1.05;letter-spacing:.5px;
+  animation:f-up .6s ease .7s both;
+}
+.splash-name em{font-style:italic;color:var(--gold-bright);font-weight:400;}
+.splash-ciclo{font-size:10px;letter-spacing:3px;color:rgba(242,217,138,.65);margin-top:6px;animation:f-up .5s ease .85s both;}
+
+.s-div{display:flex;align-items:center;gap:10px;margin:18px 0;animation:f-in .6s ease 1s both;width:220px;}
+.s-div-line{flex:1;height:.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.s-div-gem{width:7px;height:7px;background:var(--gold-bright);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 8px rgba(222,173,85,.5);}
+
+.splash-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,4vw,17px);font-style:italic;font-weight:300;color:var(--gold-pale);text-align:center;line-height:1.65;animation:f-up .5s ease 1.05s both;}
+.splash-sub strong{font-family:'Cormorant Garamond',serif;font-size:1.2em;font-weight:600;font-style:normal;color:var(--gold-bright);}
+
+.splash-cta{
+  margin-top:30px;
+  width:200px;padding:16px 0;
+  border-radius:50px;
+  border:1px solid rgba(196,151,58,.5);
+  background:rgba(196,151,58,.08);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  color:var(--gold-light);
+  font-family:'Montserrat',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;
+  cursor:pointer;
+  animation:f-up .6s ease 1.3s both;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+}
+.splash-cta::before{
+  content:'';position:absolute;
+  top:-50%;left:-60%;width:60%;height:200%;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.09),transparent);
+  animation:cta-shine 3s ease 2s infinite;
+}
+@keyframes cta-shine{0%{left:-60%;}100%{left:120%;}}
+.splash-cta:hover{background:rgba(196,151,58,.18);box-shadow:0 0 32px rgba(196,151,58,.2),0 0 0 1px rgba(196,151,58,.4);transform:translateY(-2px);}
+.splash-cta:active{transform:scale(.97);}
+
+@keyframes f-up{0%{opacity:0;transform:translateY(18px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes f-in{0%{opacity:0;}100%{opacity:1;}}
+
+/* ══════════════════════════════
+   MAIN
+══════════════════════════════ */
+#main{position:relative;z-index:1;max-width:480px;margin:0 auto;opacity:0;transition:opacity .9s ease .2s;}
+#main.show{opacity:1;}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(175deg,#0C2E60 0%,#071428 55%,var(--navy) 100%);
+  padding:60px 28px 52px;text-align:center;position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:380px;height:380px;border-radius:50%;
+  background:radial-gradient(circle,rgba(196,151,58,.14) 0%,transparent 65%);
+  pointer-events:none;
+}
+.h-ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;
+  border:.5px solid rgba(196,151,58,.12);
+  transform:translate(-50%,-50%);pointer-events:none;
+  animation:ring-breath 5s ease-in-out infinite;
+}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70px;background:linear-gradient(transparent,var(--navy));pointer-events:none;}
+
+.hero-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold-bright);margin-bottom:10px;position:relative;z-index:1;animation:f-up .6s ease .1s both;}
+.hero-school{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,8vw,40px);font-weight:300;color:var(--white);line-height:1.1;letter-spacing:.5px;position:relative;z-index:1;animation:f-up .7s ease .2s both;}
+.hero-ciclo{font-size:10px;letter-spacing:2.5px;color:rgba(242,217,138,.6);margin-top:7px;position:relative;z-index:1;animation:f-up .6s ease .3s both;}
+
+.div-row{display:flex;align-items:center;gap:10px;justify-content:center;position:relative;z-index:1;}
+.dl{flex:1;max-width:80px;height:.5px;background:linear-gradient(90deg,transparent,var(--gold-bright),transparent);}
+.dg{width:7px;height:7px;background:var(--gold-bright);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 6px rgba(222,173,85,.4);}
+
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,4.5vw,19px);font-style:italic;font-weight:300;color:var(--gold-pale);line-height:1.55;position:relative;z-index:1;animation:f-up .6s ease .45s both;}
+.hero-main-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,6.5vw,32px);font-weight:600;color:var(--gold-bright);letter-spacing:.5px;position:relative;z-index:1;animation:f-up .6s ease .55s both;filter:drop-shadow(0 0 16px rgba(222,173,85,.3));}
+
+/* ── GLASS CARD ── */
+.g-card{
+  margin:20px 14px;
+  background:rgba(255,255,255,0.055);
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border:1px solid rgba(196,151,58,.22);
+  border-radius:24px;overflow:hidden;
+  position:relative;
+}
+.g-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(222,173,85,.5),transparent);pointer-events:none;}
+
+/* ── INVITE PHRASE ── */
+.invite-card{padding:24px 22px;text-align:center;}
+.invite-card p{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,19px);font-weight:400;color:rgba(255,255,255,.85);line-height:1.7;}
+.invite-card em{color:var(--gold-bright);font-style:italic;}
+
+/* ── DATE CARD ── */
+.date-card{
+  margin:0 14px 0;
+  background:rgba(255,255,255,0.055);
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border:1px solid rgba(196,151,58,.22);
+  border-radius:24px;
+  padding:26px 24px;text-align:center;position:relative;overflow:hidden;
+}
+.date-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(222,173,85,.5),transparent);pointer-events:none;}
+.date-card::after{content:'';position:absolute;bottom:-40%;right:-10%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(26,79,138,.3) 0%,transparent 65%);pointer-events:none;}
+.date-glow{position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(196,151,58,.1) 0%,transparent 60%);pointer-events:none;}
+
+.date-weekday{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold-bright);margin-bottom:4px;position:relative;z-index:1;}
+.date-num{
+  font-family:'Cormorant Garamond',serif;font-size:90px;font-weight:300;
+  color:var(--gold-bright);line-height:.88;position:relative;z-index:1;
+  filter:drop-shadow(0 0 24px rgba(222,173,85,.3));
+}
+.date-month{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--white);margin-top:8px;position:relative;z-index:1;}
+
+/* ══════════════════════════════
+   EVENTS — new premium design
+══════════════════════════════ */
+.events-section{padding:0 14px;display:flex;flex-direction:column;gap:14px;margin-bottom:8px;}
+
+.ev{
+  background:rgba(255,255,255,0.055);
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border:1px solid rgba(196,151,58,.2);
+  border-radius:24px;overflow:hidden;
+  position:relative;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.ev::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(222,173,85,.45),transparent);pointer-events:none;}
+.ev:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.35),0 0 0 1px rgba(196,151,58,.28);}
+
+.ev-top{
+  display:flex;align-items:center;gap:0;
+}
+.ev-time-col{
+  width:76px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 0;
+  border-right:1px solid rgba(196,151,58,.15);
+  position:relative;
+}
+.ev-time-col::after{
+  content:'';position:absolute;right:-1px;top:20%;height:60%;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(196,151,58,.3),transparent);
+}
+.ev-hour{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:600;color:var(--gold-bright);line-height:1;
+  filter:drop-shadow(0 0 8px rgba(222,173,85,.3));
+}
+.ev-ampm{font-size:8px;font-weight:600;letter-spacing:2px;color:rgba(196,151,58,.7);margin-top:2px;text-transform:uppercase;}
+
+.ev-info{padding:18px 18px 18px 16px;flex:1;}
+.ev-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(196,151,58,.1);
+  border:1px solid rgba(196,151,58,.25);
+  border-radius:30px;
+  padding:3px 11px;
+  font-size:8.5px;font-weight:600;letter-spacing:2px;
+  color:var(--gold-bright);text-transform:uppercase;margin-bottom:8px;
+}
+.ev-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:19px;font-weight:600;color:var(--white);
+  line-height:1.2;margin-bottom:5px;
+}
+.ev-venue{
+  font-size:11px;color:rgba(200,220,240,.65);
+  display:flex;align-items:flex-start;gap:5px;line-height:1.45;margin-bottom:14px;
+}
+.ev-venue svg{width:11px;height:11px;flex-shrink:0;margin-top:1px;color:var(--gold);}
+
+/* MAP BUTTON — premium pill */
+.map-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;
+  border-radius:50px;
+  text-decoration:none;
+  font-family:'Montserrat',sans-serif;
+  font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+}
+.map-pill::before{
+  content:'';position:absolute;
+  top:-50%;left:-60%;width:55%;height:200%;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.07),transparent);
+  animation:pill-shine 3.5s ease infinite;
+}
+@keyframes pill-shine{0%{left:-60%;}100%{left:120%;}}
+
+.map-pill-gold{
+  background:linear-gradient(135deg,rgba(196,151,58,.18),rgba(196,151,58,.08));
+  border:1px solid rgba(196,151,58,.45);
+  color:var(--gold-light);
+}
+.map-pill-gold:hover{background:linear-gradient(135deg,rgba(196,151,58,.28),rgba(196,151,58,.15));box-shadow:0 4px 24px rgba(196,151,58,.25),0 0 0 1px rgba(196,151,58,.5);transform:translateY(-1px);}
+.map-pill-gold:active{transform:scale(.97);}
+
+.map-pill-blue{
+  background:linear-gradient(135deg,rgba(37,99,171,.2),rgba(37,99,171,.08));
+  border:1px solid rgba(91,155,213,.35);
+  color:var(--blue-pale);
+}
+.map-pill-blue:hover{background:linear-gradient(135deg,rgba(37,99,171,.3),rgba(37,99,171,.15));box-shadow:0 4px 24px rgba(37,99,171,.25),0 0 0 1px rgba(91,155,213,.4);transform:translateY(-1px);}
+.map-pill-blue:active{transform:scale(.97);}
+
+.map-pill-icon{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.map-pill-gold .map-pill-icon{background:rgba(196,151,58,.2);}
+.map-pill-blue .map-pill-icon{background:rgba(37,99,171,.25);}
+.map-pill svg{width:13px;height:13px;}
+
+/* ── PHOTOS SECTION ── */
+.photos-section{padding:0 14px;margin-bottom:8px;}
+.section-label{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+}
+.section-label-line{flex:1;height:.5px;background:linear-gradient(90deg,rgba(196,151,58,.4),transparent);}
+.section-label-text{font-size:8.5px;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold-bright);white-space:nowrap;}
+
+.photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.photo-frame{
+  position:relative;aspect-ratio:4/3;
+  border-radius:18px;overflow:hidden;
+  border:1px solid rgba(196,151,58,.25);
+  cursor:pointer;
+  transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s ease;
+}
+.photo-frame:hover{transform:scale(1.04);box-shadow:0 16px 48px rgba(0,0,0,.45),0 0 0 1px rgba(196,151,58,.4);}
+.photo-frame:active{transform:scale(.96);}
+.photo-frame img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+.photo-frame:hover img{transform:scale(1.08);}
+
+.photo-placeholder{
+  width:100%;height:100%;
+  background:linear-gradient(145deg,rgba(26,79,138,.35),rgba(6,15,30,.85));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+}
+.photo-placeholder svg{width:28px;height:28px;opacity:.35;color:var(--blue-pale);}
+.photo-placeholder span{font-size:8px;color:rgba(200,220,240,.5);font-weight:500;letter-spacing:2.5px;text-transform:uppercase;}
+
+.photo-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(6,15,30,.65) 0%,transparent 55%);
+  pointer-events:none;
+  transition:opacity .3s;
+}
+.photo-frame:hover .photo-overlay{opacity:.7;}
+
+.photo-badge-g{
+  position:absolute;bottom:9px;left:10px;
+  background:rgba(6,15,30,.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(196,151,58,.35);
+  color:var(--gold-light);
+  font-size:8px;font-weight:600;letter-spacing:2px;
+  padding:4px 10px;border-radius:30px;text-transform:uppercase;
+}
+.photo-zoom-icon{
+  position:absolute;top:9px;right:9px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(6,15,30,.5);backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .25s;
+}
+.photo-frame:hover .photo-zoom-icon{opacity:1;}
+.photo-zoom-icon svg{width:13px;height:13px;color:var(--white);}
+
+.photo-shine-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.09) 0%,transparent 45%);
+  pointer-events:none;border-radius:18px;
+}
+
+/* ── FOOTER ── */
+.footer{
+  background:linear-gradient(170deg,#0D2E60 0%,#030912 100%);
+  padding:34px 24px 52px;text-align:center;
+  position:relative;overflow:hidden;margin-top:8px;
+}
+.footer::before{
+  content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(196,151,58,.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.footer-quote{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;font-weight:300;color:var(--gold-pale);line-height:1.75;margin-bottom:16px;position:relative;z-index:1;}
+.footer-school{font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(196,151,58,.45);position:relative;z-index:1;}
+
+/* ══════════════════════════════
+   LIGHTBOX
+══════════════════════════════ */
+#lightbox{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(3,9,18,.96);
+  backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .35s ease;
+  touch-action:pan-x;
+}
+#lightbox.open{display:flex;}
+#lightbox.visible{opacity:1;}
+
+.lb-stage{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;flex:1;overflow:hidden;
+  user-select:none;
+}
+
+.lb-img{
+  max-width:88vw;max-height:70vh;
+  border-radius:16px;
+  border:1px solid rgba(196,151,58,.3);
+  object-fit:contain;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);
+  transition:transform .38s cubic-bezier(.22,1.1,.5,1),opacity .3s ease;
+  transform:scale(.88);opacity:0;
+}
+.lb-img.ready{transform:scale(1);opacity:1;}
+.lb-img.slide-left{transform:translateX(-6%) scale(.95);opacity:0;}
+.lb-img.slide-right{transform:translateX(6%) scale(.95);opacity:0;}
+
+.lb-placeholder-box{
+  width:min(300px,80vw);height:220px;
+  border-radius:16px;border:1px solid rgba(196,151,58,.3);
+  background:rgba(26,79,138,.2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  color:rgba(200,220,240,.5);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  opacity:0;transition:opacity .3s ease;
+}
+.lb-placeholder-box.ready{opacity:1;}
+.lb-placeholder-box svg{width:40px;height:40px;opacity:.3;}
+
+/* nav arrows */
+.lb-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--white);z-index:10;
+  transition:all .2s ease;
+}
+.lb-arrow:hover{background:rgba(196,151,58,.18);border-color:rgba(196,151,58,.4);box-shadow:0 0 20px rgba(196,151,58,.2);}
+.lb-arrow:active{transform:translateY(-50%) scale(.93);}
+.lb-prev{left:12px;}
+.lb-next{right:12px;}
+.lb-arrow svg{width:18px;height:18px;}
+
+/* close */
+.lb-close{
+  position:absolute;top:18px;right:18px;z-index:20;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--white);transition:all .2s;
+}
+.lb-close:hover{background:rgba(255,255,255,.14);transform:scale(1.08);}
+
+/* dots */
+.lb-dots{
+  display:flex;gap:7px;padding:16px 0 24px;
+  align-items:center;justify-content:center;
+}
+.lb-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(196,151,58,.3);
+  border:1px solid rgba(196,151,58,.4);
+  transition:all .25s ease;cursor:pointer;
+}
+.lb-dot.active{
+  background:var(--gold-bright);
+  width:20px;border-radius:3px;
+  box-shadow:0 0 8px rgba(222,173,85,.4);
+}
+
+/* caption */
+.lb-caption-bar{
+  padding:0 0 8px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.lb-caption-text{
+  font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-bright);
+  background:rgba(7,20,41,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:6px 22px;border-radius:30px;
+  border:1px solid rgba(196,151,58,.22);
+}
+.lb-counter{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;}
+
+/* ══════════════════════════════
+   CONFETTI
+══════════════════════════════ */
+.cfp{position:fixed;top:-8px;pointer-events:none;z-index:2500;animation:cf-fall linear forwards;}
+@keyframes cf-fall{0%{opacity:1;transform:translateY(0) rotate(0);}85%{opacity:.8;}100%{opacity:0;transform:translateY(100vh) rotate(700deg);}}
+
+/* ══════════════════════════════
+   REVEAL ON SCROLL
+══════════════════════════════ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .75s ease,transform .75s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:.1s;}
+.reveal-delay-2{transition-delay:.2s;}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- ══════════ SPLASH ══════════ -->
+<div id="splash">
+  <div id="orbsContainer"></div>
+  <div id="splashParticles"></div>
+
+  <div class="s-ring" style="width:170px;height:170px;"></div>
+  <div class="s-ring" style="width:240px;height:240px;animation-delay:.3s;border-color:rgba(196,151,58,.13);"></div>
+  <div class="s-ring" style="width:320px;height:320px;animation-delay:.7s;border-color:rgba(196,151,58,.07);"></div>
+  <div class="s-ring" style="width:420px;height:420px;animation-delay:1s;border-color:rgba(196,151,58,.04);"></div>
+
+  <div class="splash-inner">
+    <svg class="splash-hat" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="44" rx="48" ry="11" fill="rgba(196,151,58,.12)" stroke="rgba(196,151,58,.25)" stroke-width=".5"/>
+      <polygon points="55,7 103,33 55,42 7,33" fill="url(#hg2)"/>
+      <rect x="16" y="33" width="78" height="7" rx="1.5" fill="url(#hg1)"/>
+      <line x1="55" y1="42" x2="55" y2="70" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="55" cy="73" r="5" fill="url(#hg3)"/>
+      <circle cx="55" cy="73" r="2.5" fill="var(--gold-light)"/>
+      <defs>
+        <linearGradient id="hg1" x1="16" y1="36" x2="94" y2="36" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#7A5A10"/><stop offset=".5" stop-color="#E8C060"/><stop offset="1" stop-color="#7A5A10"/>
+        </linearGradient>
+        <linearGradient id="hg2" x1="7" y1="24" x2="103" y2="24" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#9A7220"/><stop offset=".5" stop-color="#F2D98A"/><stop offset="1" stop-color="#9A7220"/>
+        </linearGradient>
+        <radialGradient id="hg3" cx="50%" cy="30%" r="70%" gradientUnits="objectBoundingBox">
+          <stop stop-color="#DEAD55"/><stop offset="1" stop-color="#9A7220"/>
+        </radialGradient>
+      </defs>
+    </svg>
+
+    <div class="splash-stars-row">
+      <div class="s-star"></div>
+      <div class="s-star"></div>
+      <div class="s-star"></div>
+    </div>
+
+    <p class="splash-eyebrow">Jardín de Niños</p>
+    <h1 class="splash-name">Rosaura<br><em>Zapata</em></h1>
+    <p class="splash-ciclo">Ciclo Escolar &nbsp;2025 — 2026</p>
+
+    <div class="s-div">
+      <span class="s-div-line"></span>
+      <span class="s-div-gem"></span>
+      <span class="s-div-line"></span>
+    </div>
+
+    <p class="splash-sub">
+      Con orgullo te invitamos a celebrar nuestra<br>
+      <strong>Ceremonia de Graduación</strong><br>
+      Miércoles 15 de Julio · 2026
+    </p>
+
+    <button class="splash-cta" id="splashBtn">✦ &ensp; Ver Invitación &ensp; ✦</button>
+  </div>
+</div>
+
+<!-- ══════════ MAIN ══════════ -->
+<div id="main">
+
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="h-ring" style="width:220px;height:220px;"></div>
+    <div class="h-ring" style="width:320px;height:320px;animation-delay:.4s;border-color:rgba(196,151,58,.07);"></div>
+    <div class="h-ring" style="width:440px;height:440px;animation-delay:.8s;border-color:rgba(196,151,58,.04);"></div>
+
+    <p class="hero-eyebrow">Jardín de Niños</p>
+    <h1 class="hero-school">Rosaura Zapata</h1>
+    <p class="hero-ciclo">Ciclo Escolar 2025 – 2026</p>
+
+    <div class="div-row" style="margin:18px 0;">
+      <span class="dl"></span><span class="dg"></span><span class="dl"></span>
+    </div>
+
+    <p class="hero-sub">Con profundo orgullo y alegría<br>te invitamos a celebrar la</p>
+    <p class="hero-main-title" style="margin-top:10px;">✦ &ensp; Ceremonia de Graduación &ensp; ✦</p>
+  </div>
+
+  <!-- invite phrase -->
+  <div class="g-card reveal" style="padding:24px 22px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,19px);font-weight:400;color:rgba(255,255,255,.85);line-height:1.7;">
+      Tenemos el honor de invitarle a ser testigo del primer gran logro de nuestros <em style="color:var(--gold-bright);font-style:italic;">pequeños grandes graduados</em>, quienes hoy cierran un capítulo lleno de descubrimientos y alegría.
+    </p>
+  </div>
+
+  <!-- date -->
+  <div class="date-card reveal reveal-delay-1" style="margin:0 14px;">
+    <div class="date-glow"></div>
+    <p class="date-weekday">Miércoles</p>
+    <p class="date-num">15</p>
+    <div class="div-row" style="margin:10px 0;position:relative;z-index:1;">
+      <span class="dl" style="max-width:60px;"></span><span class="dg"></span><span class="dl" style="max-width:60px;"></span>
+    </div>
+    <p class="date-month" style="position:relative;z-index:1;">Julio de 2026</p>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="events-section" style="margin-top:20px;">
+
+    <!-- 8 AM Religiosa -->
+    <div class="ev reveal">
+      <div class="ev-top">
+        <div class="ev-time-col">
+          <p class="ev-hour">8</p>
+          <p class="ev-ampm">AM</p>
+        </div>
+        <div class="ev-info">
+          <div class="ev-tag">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+            Ceremonia Religiosa
+          </div>
+          <p class="ev-title">Misa de Graduación</p>
+          <p class="ev-venue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Parroquia de San Mateo Atenco
+          </p>
+          <a class="map-pill map-pill-gold" href="https://maps.google.com/?q=Parroquia+San+Mateo+Atenco+Estado+de+Mexico" target="_blank" rel="noopener">
+            <span class="map-pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            </span>
+            Cómo llegar
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 AM Graduación -->
+    <div class="ev reveal reveal-delay-1">
+      <div class="ev-top">
+        <div class="ev-time-col">
+          <p class="ev-hour">9</p>
+          <p class="ev-ampm">AM</p>
+        </div>
+        <div class="ev-info">
+          <div class="ev-tag" style="background:rgba(37,99,171,.15);border-color:rgba(91,155,213,.3);color:var(--blue-pale);">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 9L12 2 2 9"/><path d="M6 9v11h12V9"/><path d="M10 15h4"/></svg>
+            Graduación
+          </div>
+          <p class="ev-title">Ceremonia de Graduación</p>
+          <p class="ev-venue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Salón Santé
+          </p>
+          <a class="map-pill map-pill-blue" href="https://maps.google.com/?q=Salon+Sante+Atenco+Estado+de+Mexico" target="_blank" rel="noopener">
+            <span class="map-pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            </span>
+            Cómo llegar al salón
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHOTOS -->
+  <div class="photos-section reveal reveal-delay-2" style="margin-top:24px;">
+    <div class="section-label">
+      <span class="section-label-line"></span>
+      <span class="section-label-text">Nuestros Grupos</span>
+      <span class="section-label-line" style="background:linear-gradient(90deg,transparent,rgba(196,151,58,.4));transform:scaleX(-1);"></span>
+    </div>
+
+    <div class="photos-grid">
+      <div class="photo-frame" onclick="openLightbox(0)">
+        <img src="1.jpg" alt="Grupo 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+        <div class="photo-placeholder" style="display:none;">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="40" height="30" rx="3"/><circle cx="17" cy="22" r="5"/><path d="M4 34l10-10 10 8 8-10 12 12" fill="none"/></svg>
+          <span>Grupo 1</span>
+        </div>
+        <div class="photo-overlay"></div>
+        <div class="photo-shine-overlay"></div>
+        <span class="photo-badge-g">Grupo 1</span>
+        <div class="photo-zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div>
+      </div>
+
+      <div class="photo-frame" onclick="openLightbox(1)">
+        <img src="2.jpg" alt="Grupo 2" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+        <div class="photo-placeholder" style="display:none;">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="40" height="30" rx="3"/><circle cx="17" cy="22" r="5"/><path d="M4 34l10-10 10 8 8-10 12 12" fill="none"/></svg>
+          <span>Grupo 2</span>
+        </div>
+        <div class="photo-overlay"></div>
+        <div class="photo-shine-overlay"></div>
+        <span class="photo-badge-g">Grupo 2</span>
+        <div class="photo-zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div>
+      </div>
+
+      <div class="photo-frame" onclick="openLightbox(2)">
+        <img src="3.jpg" alt="Grupo 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+        <div class="photo-placeholder" style="display:none;">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="40" height="30" rx="3"/><circle cx="17" cy="22" r="5"/><path d="M4 34l10-10 10 8 8-10 12 12" fill="none"/></svg>
+          <span>Grupo 3</span>
+        </div>
+        <div class="photo-overlay"></div>
+        <div class="photo-shine-overlay"></div>
+        <span class="photo-badge-g">Grupo 3</span>
+        <div class="photo-zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div>
+      </div>
+
+      <div class="photo-frame" onclick="openLightbox(3)">
+        <img src="4.jpg" alt="Grupo 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+        <div class="photo-placeholder" style="display:none;">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="40" height="30" rx="3"/><circle cx="17" cy="22" r="5"/><path d="M4 34l10-10 10 8 8-10 12 12" fill="none"/></svg>
+          <span>Grupo 4</span>
+        </div>
+        <div class="photo-overlay"></div>
+        <div class="photo-shine-overlay"></div>
+        <span class="photo-badge-g">Grupo 4</span>
+        <div class="photo-zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer reveal">
+    <div class="div-row" style="margin-bottom:20px;">
+      <span class="dl" style="background:linear-gradient(90deg,transparent,rgba(196,151,58,.35),transparent);"></span>
+      <span class="dg" style="background:rgba(196,151,58,.45);box-shadow:0 0 8px rgba(222,173,85,.25);"></span>
+      <span class="dl" style="background:linear-gradient(90deg,transparent,rgba(196,151,58,.35),transparent);"></span>
+    </div>
+    <p class="footer-quote">"El inicio de cada gran historia<br>comienza con un pequeño primer paso"</p>
+    <div class="div-row" style="margin:18px 0;">
+      <span class="dl" style="background:linear-gradient(90deg,transparent,rgba(196,151,58,.2),transparent);"></span>
+      <span class="dg" style="background:rgba(196,151,58,.3);"></span>
+      <span class="dl" style="background:linear-gradient(90deg,transparent,rgba(196,151,58,.2),transparent);"></span>
+    </div>
+    <p class="footer-school">Jardín de Niños &nbsp;·&nbsp; Rosaura Zapata &nbsp;·&nbsp; 2025 – 2026</p>
+  </div>
+
+</div>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+
+  <div class="lb-stage" id="lbStage">
+    <button class="lb-arrow lb-prev" onclick="lbNav(-1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <img class="lb-img" id="lbImg" src="" alt=""/>
+    <div class="lb-placeholder-box" id="lbPh" style="display:none;">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="40" height="30" rx="3"/><circle cx="17" cy="22" r="5"/><path d="M4 34l10-10 10 8 8-10 12 12" fill="none"/></svg>
+    </div>
+    <button class="lb-arrow lb-next" onclick="lbNav(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div class="lb-caption-bar">
+    <div class="lb-caption-text" id="lbCaption"></div>
+    <div class="lb-counter" id="lbCounter"></div>
+  </div>
+
+  <div class="lb-dots" id="lbDots"></div>
+</div>
+
+<script>
+/* ────────────────────── STARFIELD ────────────────────── */
+(()=>{
+  const c=document.getElementById('starfield'),ctx=c.getContext('2d');
+  let stars=[];
+  const resize=()=>{c.width=innerWidth;c.height=innerHeight;};
+  const mk=()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+.2,a:Math.random(),da:(Math.random()*.007+.002)*(Math.random()<.5?1:-1),vy:Math.random()*.12+.04});
+  window.addEventListener('resize',resize);
+  resize();stars=Array.from({length:160},mk);
+  (function loop(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.da;if(s.a<=0||s.a>=1)s.da*=-1;
+      s.y-=s.vy;if(s.y<-2)s.y=c.height+2;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(230,210,150,${s.a})`;ctx.fill();
+    });requestAnimationFrame(loop);
+  })();
+})();
+
+/* ────────────────────── ORBS ────────────────────── */
+(()=>{
+  const oc=document.getElementById('orbsContainer');
+  const data=[
+    {w:280,h:280,t:'-5%',l:'15%',bg:'rgba(26,79,138,.22)',dur:9,del:0},
+    {w:200,h:200,t:'60%',l:'60%',bg:'rgba(196,151,58,.14)',dur:11,del:2},
+    {w:160,h:160,t:'30%',l:'-5%',bg:'rgba(26,79,138,.15)',dur:13,del:4},
+  ];
+  data.forEach(d=>{
+    const o=document.createElement('div');o.className='orb';
+    o.style.cssText=`width:${d.w}px;height:${d.h}px;top:${d.t};left:${d.l};background:${d.bg};animation-duration:${d.dur}s;animation-delay:${d.del}s;`;
+    oc.appendChild(o);
+  });
+})();
+
+/* ────────────────────── PARTICLES ────────────────────── */
+(()=>{
+  const pc=document.getElementById('splashParticles');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div');p.className='sp';
+    const sz=Math.random()*9+2;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${Math.random()*7+5}s;animation-delay:${Math.random()*5}s;`;
+    pc.appendChild(p);
+  }
+})();
+
+/* ────────────────────── CONFETTI ────────────────────── */
+function launchConfetti(){
+  const cols=['#DEAD55','#C49A38','#F2D98A','#B8D4F5','#FFFFFF','#5B9BD5','#FAF0D4'];
+  for(let i=0;i<80;i++){
+    setTimeout(()=>{
+      const d=document.createElement('div');d.className='cfp';
+      const c=cols[Math.floor(Math.random()*cols.length)];
+      const sz=Math.random()*9+4,dur=Math.random()*2.8+1.8;
+      const shapes=[{br:'50%'},{br:'0'},{br:'0',rot:'rotate(45deg)'}];
+      const sh=shapes[Math.floor(Math.random()*shapes.length)];
+      d.style.cssText=`left:${Math.random()*100}vw;width:${sz}px;height:${sz}px;background:${c};border-radius:${sh.br};transform:${sh.rot||''};animation-duration:${dur}s;`;
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(),(dur+.5)*1000);
+    },i*35);
+  }
+}
+
+/* ────────────────────── SPLASH ────────────────────── */
+document.getElementById('splashBtn').addEventListener('click',()=>{
+  launchConfetti();
+  const sp=document.getElementById('splash'),m=document.getElementById('main');
+  sp.classList.add('hide');m.classList.add('show');
+  setTimeout(()=>sp.style.display='none',950);
+  setTimeout(initReveal,300);
+});
+
+/* ────────────────────── SCROLL REVEAL ────────────────────── */
+function initReveal(){
+  const els=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.1});
+  els.forEach(el=>{
+    const r=el.getBoundingClientRect();
+    if(r.top<innerHeight)el.classList.add('visible');
+    else obs.observe(el);
+  });
+}
+
+/* ────────────────────── LIGHTBOX ────────────────────── */
+const PHOTOS=[
+  {src:'1.jpg',label:'Grupo 1'},
+  {src:'2.jpg',label:'Grupo 2'},
+  {src:'3.jpg',label:'Grupo 3'},
+  {src:'4.jpg',label:'Grupo 4'},
+];
+let lbIdx=0,lbOpen=false;
+
+function buildDots(){
+  const c=document.getElementById('lbDots');c.innerHTML='';
+  PHOTOS.forEach((_,i)=>{
+    const d=document.createElement('div');d.className='lb-dot'+(i===lbIdx?' active':'');
+    d.onclick=()=>lbGoTo(i);c.appendChild(d);
+  });
+}
+
+function lbGoTo(idx,dir){
+  const img=document.getElementById('lbImg'),ph=document.getElementById('lbPh');
+  // animate out
+  img.classList.remove('ready');
+  if(dir!=null)img.classList.add(dir>0?'slide-left':'slide-right');
+  setTimeout(()=>{
+    img.className='lb-img';ph.style.display='none';img.style.display='block';
+    lbIdx=((idx%PHOTOS.length)+PHOTOS.length)%PHOTOS.length;
+    document.getElementById('lbCaption').textContent=PHOTOS[lbIdx].label;
+    document.getElementById('lbCounter').textContent=`${lbIdx+1} / ${PHOTOS.length}`;
+    buildDots();
+    const t=new Image();
+    t.onload=()=>{img.src=PHOTOS[lbIdx].src;requestAnimationFrame(()=>img.classList.add('ready'));};
+    t.onerror=()=>{img.style.display='none';ph.style.display='flex';ph.classList.add('ready');};
+    t.src=PHOTOS[lbIdx].src;
+  },dir!=null?200:0);
+}
+
+function openLightbox(idx){
+  lbIdx=idx;lbOpen=true;
+  const lb=document.getElementById('lightbox');
+  document.getElementById('lbImg').className='lb-img';
+  document.getElementById('lbPh').style.display='none';
+  lb.style.display='flex';
+  requestAnimationFrame(()=>lb.classList.add('visible'));
+  lbGoTo(lbIdx);
+  document.body.style.overflow='hidden';
+}
+
+function closeLightbox(){
+  const lb=document.getElementById('lightbox');
+  lb.classList.remove('visible');
+  setTimeout(()=>{lb.style.display='none';lbOpen=false;document.body.style.overflow='';},350);
+}
+
+function lbNav(dir){
+  document.getElementById('lbImg').classList.remove('ready');
+  setTimeout(()=>lbGoTo(lbIdx+dir,dir),0);
+}
+
+// close on backdrop
+document.getElementById('lightbox').addEventListener('click',e=>{
+  if(e.target===document.getElementById('lightbox'))closeLightbox();
+});
+
+// keyboard
+document.addEventListener('keydown',e=>{
+  if(!lbOpen)return;
+  if(e.key==='Escape')closeLightbox();
+  if(e.key==='ArrowRight')lbNav(1);
+  if(e.key==='ArrowLeft')lbNav(-1);
+});
+
+// swipe
+let tx=0;
+document.getElementById('lbStage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.getElementById('lbStage').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50)lbNav(dx<0?1:-1);
+},{passive:true});
+</script>
+</body>
+</html>
