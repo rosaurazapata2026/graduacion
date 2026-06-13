@@ -705,7 +705,7 @@ body{
     <div class="div-row" style="margin:10px 0;position:relative;z-index:1;">
       <span class="dl" style="max-width:60px;"></span><span class="dg"></span><span class="dl" style="max-width:60px;"></span>
     </div>
-    <p class="date-month" style="position:relative;z-index:1;">Julio de 2026</p>
+    <p class="date-month" style="position:relative;z-index:1;">Julio del 2026</p>
   </div>
 
 
@@ -956,17 +956,8 @@ document.getElementById('splashBtn').addEventListener('click',()=>{
   sp.classList.add('hide');m.classList.add('show');
   setTimeout(()=>sp.style.display='none',950);
   setTimeout(initReveal,300);
-  // Iniciar música automáticamente al abrir la invitación
-  const audio = document.getElementById('bgMusic');
-  const btn = document.getElementById('musicBtn');
-  if(audio && audio.paused){
-    audio.play().then(()=>{
-      btn.classList.add('playing');
-    }).catch(e=>{
-      // Si el navegador bloquea autoplay, mostrar el botón para que el usuario lo active manualmente
-      console.log('Autoplay bloqueado por el navegador:', e);
-    });
-  }
+  // Iniciar música al abrir la invitación — el clic del usuario satisface la política de autoplay
+  setTimeout(()=>{ if(typeof window._bgAudioPlay==='function') window._bgAudioPlay(); },200);
 });
 
 /* ────────────────────── SCROLL REVEAL ────────────────────── */
@@ -1049,14 +1040,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight')lbNav(1);
   if(e.key==='ArrowLeft')lbNav(-1);
 });
-
-// swipe
-let tx=0;
-document.getElementById('lbStage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
-document.getElementById('lbStage').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-tx;
-  if(Math.abs(dx)>50)lbNav(dx<0?1:-1);
-},{passive:true});
+// (swipe navigation is handled by the pinch-zoom module below)
 </script>
 
 <!-- MUSIC BUTTON -->
@@ -1121,8 +1105,21 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
   audio.loop = true;
   audio.volume = 0.55;
 
+  // Expose globally so splash button can start it
+  window._bgAudio = audio;
+
   const btn = document.getElementById('musicBtn');
   let playing = false;
+
+  // Allow splash button to trigger play
+  window._bgAudioPlay = function(){
+    if(!playing){
+      audio.play().then(()=>{
+        playing = true;
+        btn.classList.add('playing');
+      }).catch(()=>{});
+    }
+  };
 
   btn.addEventListener('click', ()=>{
     if(!playing){
@@ -1147,6 +1144,8 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
   let isPanning=false, panStartX=0, panStartY=0;
   let touchStartDist=0, pinching=false;
   let hintTimeout;
+  // Swipe detection (only when not zoomed)
+  let swipeStartX=0, swipeStartY=0, swipeActive=false;
 
   function showHint(){
     hint.classList.remove('hidden');
@@ -1156,7 +1155,6 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
 
   function applyTransform(){
     if(!img) return;
-    // Clamp pan so image doesn't fly off screen
     const maxPanX = Math.max(0, (scale-1)*img.offsetWidth*0.5);
     const maxPanY = Math.max(0, (scale-1)*img.offsetHeight*0.5);
     panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
@@ -1175,11 +1173,9 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
     }
   }
 
-  // Expose reset for lbGoTo
   window._lbResetZoom = resetZoom;
 
   function dist(t){ return Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY); }
-  function mid(t){ return {x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2}; }
 
   stage.addEventListener('touchstart', e=>{
     img = document.getElementById('lbImg');
@@ -1187,12 +1183,23 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
     if(e.touches.length===2){
       e.preventDefault();
       pinching=true;
+      swipeActive=false;
       touchStartDist = dist(e.touches);
       lastScale = scale;
-    } else if(e.touches.length===1 && scale>1){
-      isPanning=true;
-      panStartX = e.touches[0].clientX - panX;
-      panStartY = e.touches[0].clientY - panY;
+    } else if(e.touches.length===1){
+      if(scale>1){
+        // panning mode
+        isPanning=true;
+        panStartX = e.touches[0].clientX - panX;
+        panStartY = e.touches[0].clientY - panY;
+        swipeActive=false;
+      } else {
+        // potential swipe — track but don't nav yet
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+        swipeActive=true;
+        isPanning=false;
+      }
     }
   },{passive:false});
 
@@ -1208,22 +1215,37 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
       panX = e.touches[0].clientX - panStartX;
       panY = e.touches[0].clientY - panStartY;
       applyTransform();
+    } else if(swipeActive && e.touches.length===1 && scale<=1){
+      // Allow native scroll-like feel — swipe nav on touchend
+      const dx = Math.abs(e.touches[0].clientX - swipeStartX);
+      const dy = Math.abs(e.touches[0].clientY - swipeStartY);
+      if(dx > dy && dx > 8) e.preventDefault(); // prevent page scroll only on horizontal swipe
     }
   },{passive:false});
 
   stage.addEventListener('touchend', e=>{
     if(e.touches.length < 2){ pinching=false; lastScale=scale; }
-    if(e.touches.length === 0){ isPanning=false; }
-    // If zoomed out, reset fully
+    if(e.touches.length === 0){
+      if(isPanning){ isPanning=false; }
+      if(swipeActive && scale<=1 && !pinching){
+        // Evaluate swipe for navigation
+        const dx = e.changedTouches[0].clientX - swipeStartX;
+        const dy = Math.abs(e.changedTouches[0].clientY - swipeStartY);
+        if(Math.abs(dx) > 50 && dy < 60){
+          lbNav(dx < 0 ? 1 : -1);
+        }
+        swipeActive=false;
+      }
+    }
     if(scale <= 1.05){ scale=1; resetZoom(); }
   },{passive:true});
 
-  // Double-tap to zoom / reset on mobile
+  // Double-tap to zoom / reset
   let lastTap=0;
   stage.addEventListener('touchend', e=>{
     if(pinching) return;
     const now=Date.now();
-    if(now-lastTap < 300){
+    if(now-lastTap < 300 && e.changedTouches.length===1){
       if(scale>1) resetZoom();
       else { scale=2.5; applyTransform(); }
     }
@@ -1238,7 +1260,6 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
     else { scale=2; applyTransform(); }
   });
 
-  // Show hint when lightbox opens
   const origOpenLightbox = window.openLightbox;
   window.openLightbox = function(idx){
     origOpenLightbox(idx);
@@ -1246,7 +1267,6 @@ document.getElementById('lbStage').addEventListener('touchend',e=>{
     showHint();
   };
 
-  // Reset zoom on navigation
   const origLbGoTo = window.lbGoTo;
   window.lbGoTo = function(idx, dir){
     resetZoom();
